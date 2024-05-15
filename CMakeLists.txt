@@ -14,7 +14,9 @@
     include_directories(${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIR})
 
 
-    add_executable(${PROJECT_NAME} main.cpp)
+    add_executable(${PROJECT_NAME} main.cpp
+            storage.cpp
+    )
 
 
     target_link_libraries(${PROJECT_NAME}
