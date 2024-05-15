@@ -69,8 +69,36 @@ int main(int argc, char *argv[]) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 quit = true;
+            } else if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+                    case SDLK_w:
+                        player.y -= 20;
+                        break;
+                    case SDLK_s:
+                        player.y += 20;
+                        break;
+                    case SDLK_a:
+                        player.x -= 20;
+                        break;
+                    case SDLK_d:
+                        player.x += 20;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
+
+        SDL_SetRenderDrawColor(renderer, 0, 100, 10, 255);
+        SDL_RenderClear(renderer);
+
+        renderPlayer(renderer, player);
+        renderFood(renderer, food);
+
+
+
+        // presenting on the screen
+        SDL_RenderPresent(renderer);
     }
 
     // gc
