@@ -34,6 +34,20 @@ bool checkCollision(const Segment& segment, const SDL_Rect& rect) {
     return segment.x == rect.x && segment.y == rect.y;
 }
 
+bool checkSelfCollision(const vector<Segment>& snake) {
+    const Segment& head = snake[0];
+    for (size_t i = 1; i < snake.size(); ++i) {
+        if (head.x == snake[i].x && head.y == snake[i].y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkWallCollision(const Segment& head) {
+    return head.x < 0 || head.x >= 640 || head.y < 0 || head.y >= 480;
+}
+
 int main(int argc, char *argv[]) {
 
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -112,6 +126,11 @@ int main(int argc, char *argv[]) {
         Uint32 currentTime = SDL_GetTicks();
         if (currentTime - lastMove >= moveDelay) {
             Segment newHead = {snake[0].x + directionX * speed, snake[0].y + directionY * speed};
+
+            if (checkWallCollision(newHead) || checkSelfCollision(snake)) {
+                quit = true;
+                continue;
+            }s
 
             if (checkCollision(newHead, food)) {
                 food = createFood();
