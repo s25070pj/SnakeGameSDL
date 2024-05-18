@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
             if (checkWallCollision(newHead) || checkSelfCollision(snake)) {
                 quit = true;
                 continue;
-            }s
+            }
 
             if (checkCollision(newHead, food)) {
                 food = createFood();
