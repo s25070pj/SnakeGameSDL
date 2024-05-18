@@ -65,6 +65,14 @@ int main(int argc, char *argv[]) {
     //game
     bool quit = false;
     SDL_Event event;
+
+    int directionX = 0;
+    int directionY = 0;
+    const int speed = 20;
+
+    Uint32 lastMove = SDL_GetTicks();
+    const Uint32 moveDelay = 100; // Move every 100 milliseconds
+
     while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
@@ -72,16 +80,20 @@ int main(int argc, char *argv[]) {
             } else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_w:
-                        player.y -= 20;
+                        directionX = 0;
+                        directionY = -1;
                         break;
                     case SDLK_s:
-                        player.y += 20;
+                        directionX = 0;
+                        directionY = 1;
                         break;
                     case SDLK_a:
-                        player.x -= 20;
+                        directionX = -1;
+                        directionY = 0;
                         break;
                     case SDLK_d:
-                        player.x += 20;
+                        directionX = 1;
+                        directionY = 0;
                         break;
                     default:
                         break;
@@ -89,22 +101,31 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 100, 10, 255);
-        SDL_RenderClear(renderer);
+        Uint32 currentTime = SDL_GetTicks();
+        if (currentTime - lastMove >= moveDelay) {
+            player.x += directionX * speed;
+            player.y += directionY * speed;
+            lastMove = currentTime;
 
-        renderPlayer(renderer, player);
-        renderFood(renderer, food);
+            SDL_SetRenderDrawColor(renderer, 0, 100, 10, 255);
+            SDL_RenderClear(renderer);
+
+            renderPlayer(renderer, player);
+            renderFood(renderer, food);
 
 
 
-        // presenting on the screen
-        SDL_RenderPresent(renderer);
+            // presenting on the screen
+            SDL_RenderPresent(renderer);
+        }
     }
 
-    // gc
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+        // gc
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
 
-    return 0;
+        return 0;
+
+
 }
