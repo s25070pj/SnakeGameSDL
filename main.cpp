@@ -5,16 +5,33 @@
 
 using namespace std;
 
+struct Segment {
+    int x, y;
+};
 
-
-void renderPlayer(SDL_Renderer* renderer, SDL_Rect player) {
+void renderSegment(SDL_Renderer* renderer, const Segment& segment) {
+    SDL_Rect rect = {segment.x, segment.y, 20, 20};
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &player);
+    SDL_RenderFillRect(renderer, &rect);
 }
+
 
 void renderFood(SDL_Renderer* renderer, SDL_Rect food) {
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderFillRect(renderer, &food);
+}
+
+SDL_Rect createFood() {
+    SDL_Rect food;
+    food.w = 20;
+    food.h = 20;
+    food.x = (rand() % (640 / 20)) * 20;
+    food.y = (rand() % (480 / 20)) * 20;
+    return food;
+}
+
+bool checkCollision(const Segment& segment, const SDL_Rect& rect) {
+    return segment.x == rect.x && segment.y == rect.y;
 }
 
 int main(int argc, char *argv[]) {
@@ -39,22 +56,13 @@ int main(int argc, char *argv[]) {
     SDL_SetRenderDrawColor(renderer, 0, 100, 10, 255);
     SDL_RenderClear(renderer);
 
-    // player creating
-    SDL_Rect player;
-    player.x = 100;
-    player.y = 100;
-    player.w = 20;
-    player.h = 20;
 
-    // food creating
-    SDL_Rect food;
-    food.x = 200;
-    food.y = 200;
-    food.w = 20;
-    food.h = 20;
+    // create snake and food
+    vector<Segment> snake = {{100, 100}};
+    SDL_Rect food = createFood();
 
-    // rendering player and food
-    renderPlayer(renderer, player);
+    // rendering snake and food
+    renderSegment(renderer, snake[0]);
     renderFood(renderer, food);
 
 
@@ -103,20 +111,26 @@ int main(int argc, char *argv[]) {
 
         Uint32 currentTime = SDL_GetTicks();
         if (currentTime - lastMove >= moveDelay) {
-            player.x += directionX * speed;
-            player.y += directionY * speed;
-            lastMove = currentTime;
+            Segment newHead = {snake[0].x + directionX * speed, snake[0].y + directionY * speed};
+
+            if (checkCollision(newHead, food)) {
+                food = createFood();
+            } else {
+                snake.pop_back();
+            }
+
+            snake.insert(snake.begin(), newHead);
 
             SDL_SetRenderDrawColor(renderer, 0, 100, 10, 255);
             SDL_RenderClear(renderer);
 
-            renderPlayer(renderer, player);
+            for (const auto& segment : snake) {
+                renderSegment(renderer, segment);
+            }
             renderFood(renderer, food);
 
-
-
-            // presenting on the screen
             SDL_RenderPresent(renderer);
+            lastMove = currentTime;
         }
     }
 
